@@ -65,13 +65,20 @@ public class Game {
             }
         }
     }
+    
+    public void legalMoves() {
+        
+    }
 
     public void flipBoard() {
         Piece[][] tempboard = new Piece[8][8];
 
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                tempboard[7 - i][7 - j] = board[i][j];
+                Piece piece = board[i][j];
+                piece.setRow(7 - i);
+                piece.setColumn(7 - j);
+                tempboard[7 - i][7 - j] = piece;
             }
         }
 
