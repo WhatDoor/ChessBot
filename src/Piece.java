@@ -18,6 +18,9 @@ public class Piece {
     private int row = -1;
     private int column = -1;
 
+    //Special Flags
+    private boolean pawnFirstMove = false;
+
     public Piece(int pieceType, int colour) {
         this.pieceType = pieceType;
         this.colour = colour;
@@ -45,6 +48,14 @@ public class Piece {
 
     public void setColumn(int column) {
         this.column = column;
+    }
+
+    public boolean isPawnFirstMove() {
+        return pawnFirstMove;
+    }
+
+    public void setPawnFirstMove(boolean pawnFirstMove) {
+        this.pawnFirstMove = pawnFirstMove;
     }
 
     public String toString() {

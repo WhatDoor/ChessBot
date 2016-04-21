@@ -5,6 +5,7 @@ import java.util.LinkedList;
  */
 public class Game {
     Piece[][] board;
+    Piece[][] boardCopy;
     LinkedList<Piece> whitePieces;
     LinkedList<Piece> blackPieces;
 
@@ -26,7 +27,9 @@ public class Game {
         board[0][7] = new Piece(Piece.ROOK, Piece.WHITE);
 
         for (int i = 0; i < board[1].length; i++) {
-            board[1][i] = new Piece(Piece.PAWN, Piece.WHITE);
+            Piece piece = new Piece(Piece.PAWN, Piece.WHITE);
+            piece.setPawnFirstMove(true);
+            board[1][i] = piece;
         }
 
         //Add white pieces to list, also records their location
@@ -51,7 +54,9 @@ public class Game {
         board[7][7] = new Piece(Piece.ROOK, Piece.BLACK);
 
         for (int i = 0; i < board[6].length; i++) {
-            board[6][i] = new Piece(Piece.PAWN, Piece.BLACK);
+            Piece piece = new Piece(Piece.PAWN, Piece.BLACK);
+            piece.setPawnFirstMove(true);
+            board[6][i] = piece;
         }
 
         //Add black pieces to list, also records their location
@@ -66,8 +71,55 @@ public class Game {
         }
     }
     
-    public void legalMoves() {
-        
+    public LinkedList<String> legalMoves(int colour) {
+        LinkedList<String> moves = new LinkedList<>();
+
+        if (colour == Piece.BLACK) {
+            for (Piece piece: blackPieces) {
+                int row = piece.getRow();
+                int column = piece.getColumn();
+
+                if (piece.getPieceType() == Piece.PAWN) {
+                    potentialPawnMove(row, column, piece.isPawnFirstMove(), moves);
+
+                } else if (piece.getPieceType() == Piece.ROOK) {
+                    potentialRookMove(row, column, moves);
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    private void potentialRookMove(int row, int column, LinkedList<String> moves) {
+        int newRow = row;
+        while (newRow - 1 >= 0) { //going up
+            if (board[newRow - 1][column] == null || board[newRow - 1][column].getColour() == Piece.WHITE) {
+                moves.add(newRow + "" + column + (newRow - 1) + column);
+            } else if (board[newRow - 1][column].getColour() == Piece.BLACK) {
+                break;
+            }
+            newRow++;
+        }
+    }
+
+    private void potentialPawnMove(int row, int column, boolean firstMove, LinkedList<String> moves) {
+        if (firstMove && board[row - 2][column] == null) { //going forwards 2 steps
+            moves.add(row + "" + column + (row - 2) + column);
+
+        }
+        if (row - 1 >= 0 && board[row - 1][column] == null) { //Going forwards one step
+            moves.add(row + "" + column + (row - 1) + column);
+
+        }
+        if (column - 1 >= 0 && board[row - 1][column - 1] != null && board[row - 1][column - 1].getColour() == Piece.WHITE) { //going up left
+            moves.add(row + "" + column + (row - 1) + (column - 1));
+
+        }
+        if (column + 1 < 8 && board[row - 1][column + 1] != null && board[row - 1][column + 1].getColour() == Piece.WHITE) { //going up right
+            moves.add(row + "" + column + (row - 1) + (column + 1));
+
+        }
     }
 
     public void flipBoard() {
@@ -83,6 +135,20 @@ public class Game {
         }
 
         board = tempboard;
+    }
+
+    private void makeTempRecordOfBoard() {
+        boardCopy = new Piece[8][8];
+        for (int i = 0; i < board.length; i++) {
+            System.arraycopy(board[i], 0, boardCopy[i], 0, board[i].length);
+        }
+    }
+
+    public void undo() {
+        board = new Piece[8][8];
+        for (int i = 0; i < boardCopy.length; i++) {
+            System.arraycopy(boardCopy[i], 0, board[i], 0, boardCopy[i].length);
+        }
     }
 
     public void printBoard() {
@@ -145,11 +211,19 @@ public class Game {
         return score;
     }
 
-    public boolean superMove(int fromRow, int fromColumn, int toRow, int toColumn) {
+    public boolean superMove(String move) {
+        int fromRow = Integer.parseInt(move.charAt(0) + "");
+        int fromColumn = Integer.parseInt(move.charAt(1) + "");
+        int toRow = Integer.parseInt(move.charAt(2) + "");
+        int toColumn = Integer.parseInt(move.charAt(3) + "");
+
         try {
             Piece piece = board[fromRow][fromColumn];
             piece.setRow(toRow);
             piece.setColumn(toColumn);
+            if (piece.getPieceType() == Piece.PAWN) {
+                piece.setPawnFirstMove(false);
+            }
             board[fromRow][fromColumn] = null;
 
             board[toRow][toColumn] = piece;
@@ -164,10 +238,17 @@ public class Game {
 
     public static void main(String[] args) {
         Game game = new Game();
-        game.superMove(6,1,5,1);
-        game.superMove(6,2,4,2);
+        game.superMove("6151");
+        game.superMove("6222");
+        game.makeTempRecordOfBoard();
         game.printBoard();
-        System.out.println(game.evaluateBoard(Piece.BLACK));
-        System.out.println(game.evaluateBoard(Piece.WHITE));
+        LinkedList<String> list = game.legalMoves(Piece.BLACK);
+        for (String s: list) {
+            game.superMove(s);
+            game.printBoard();
+            game.undo();
+        }
+        list = game.legalMoves(Piece.BLACK);
+        System.out.println(list);
     }
 }
