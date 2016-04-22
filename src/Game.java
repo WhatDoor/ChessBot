@@ -382,7 +382,7 @@ public class Game {
                 if (piece != null)
                     System.out.print(piece.toString() + "|");
                 else
-                    System.out.print("-1" + "|");
+                    System.out.print("0 " + "|");
             }
             System.out.println();
         }
