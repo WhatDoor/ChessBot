@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.Scanner;
 
 /**
  * Created by Sebastian on 20/04/2016.
@@ -10,6 +9,7 @@ public class Game {
     LinkedList<Piece> whitePieces;
     LinkedList<Piece> blackPieces;
     LinkedList<Piece> blackPiecesCopy;
+    LinkedList<Piece> whitePiecesCopy;
 
     public Game() {
         generateNewBoard();
@@ -366,6 +366,16 @@ public class Game {
         for (int i = 0; i < board.length; i++) {
             System.arraycopy(board[i], 0, boardCopy[i], 0, board[i].length);
         }
+
+        blackPiecesCopy = new LinkedList<>();
+        for (Piece piece: blackPieces) {
+            blackPiecesCopy.add(piece);
+        }
+
+        whitePiecesCopy = new LinkedList<>();
+        for (Piece piece: whitePieces) {
+            whitePiecesCopy.add(piece);
+        }
     }
 
     public void undo() {
@@ -373,6 +383,9 @@ public class Game {
         for (int i = 0; i < boardCopy.length; i++) {
             System.arraycopy(boardCopy[i], 0, board[i], 0, boardCopy[i].length);
         }
+
+        blackPieces = blackPiecesCopy;
+        whitePieces = whitePiecesCopy;
 
     }
 
@@ -469,6 +482,27 @@ public class Game {
         return score;
     }
 
+    public String bestMove(LinkedList<String> moves) {
+        int bestScore = -1;
+        String bestMove = "";
+
+        makeTempRecordOfBoard();
+        for (String move: moves) {
+            testMove(move);
+            int score = evaluateBoard(Piece.BLACK);
+            System.out.print(score + ", ");
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+            undo();
+        }
+        System.out.println();
+
+        return bestMove;
+    }
+
     public boolean superMove(String move) {
         int fromRow = Integer.parseInt(move.charAt(0) + "");
         int fromColumn = Integer.parseInt(move.charAt(1) + "");
@@ -483,6 +517,16 @@ public class Game {
                 piece.setPawnFirstMove(false);
             }
             board[fromRow][fromColumn] = null;
+
+            Piece toPiece = board[toRow][toColumn];
+            if (toPiece != null) {
+                if (piece.getColour() == Piece.BLACK) {
+                    blackPieces.remove(toPiece);
+
+                } else if (piece.getColour() == Piece.WHITE) {
+                    whitePieces.remove(toPiece);
+                }
+            }
             board[toRow][toColumn] = piece;
             return true;
         } catch (IndexOutOfBoundsException e) {
@@ -491,7 +535,7 @@ public class Game {
         }
     }
 
-    public boolean testMove(String move) {
+    public boolean testMove(String move) { //Same as super move but does not change coords within pieces
         int fromRow = Integer.parseInt(move.charAt(0) + "");
         int fromColumn = Integer.parseInt(move.charAt(1) + "");
         int toRow = Integer.parseInt(move.charAt(2) + "");
@@ -500,6 +544,17 @@ public class Game {
         try {
             Piece piece = board[fromRow][fromColumn];
             board[fromRow][fromColumn] = null;
+
+            Piece toPiece = board[toRow][toColumn];
+            if (toPiece != null) {
+                if (piece.getColour() == Piece.BLACK) {
+                    blackPieces.remove(toPiece);
+
+                } else if (piece.getColour() == Piece.WHITE) {
+                    whitePieces.remove(toPiece);
+                }
+            }
+
             board[toRow][toColumn] = piece;
             return true;
         } catch (IndexOutOfBoundsException e) {
@@ -508,7 +563,7 @@ public class Game {
         }
     }
 
-    public boolean userMove(String move) {
+    public boolean userMove(String move) { //same as supermove but takes in coords + 1
         int fromRow = Integer.parseInt(move.charAt(0) + "") - 1;
         int fromColumn = Integer.parseInt(move.charAt(1) + "") - 1;
         int toRow = Integer.parseInt(move.charAt(2) + "") - 1;
@@ -538,6 +593,17 @@ public class Game {
                 piece.setPawnFirstMove(false);
             }
             board[fromRow][fromColumn] = null;
+
+            Piece toPiece = board[toRow][toColumn];
+            if (toPiece != null) {
+                if (piece.getColour() == Piece.BLACK) {
+                    blackPieces.remove(toPiece);
+
+                } else if (piece.getColour() == Piece.WHITE) {
+                    whitePieces.remove(toPiece);
+                }
+            }
+
             board[toRow][toColumn] = piece;
             return true;
         } catch (IndexOutOfBoundsException e) {
@@ -546,49 +612,6 @@ public class Game {
         } catch (NullPointerException e) {
             System.out.println("A piece doesn't exist in that spot");
             return false;
-        }
-    }
-
-    public String bestMove(LinkedList<String> moves) {
-        int bestScore = -1;
-        String bestMove = "";
-
-        makeTempRecordOfBoard();
-        for (String move: moves) {
-            testMove(move);
-            int score = evaluateBoard(Piece.BLACK);
-            System.out.print(score + ", ");
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = move;
-            }
-            undo();
-        }
-        System.out.println();
-
-        return bestMove;
-    }
-
-
-
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.flipBoard();
-        game.printBoard();
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNext()) {
-            String in = scan.nextLine();
-            game.userMove(in);
-            game.printBoard();
-            game.flipBoard();
-            LinkedList<String> legalMoves = game.legalMoves(Piece.BLACK);
-            System.out.println(legalMoves);
-            String move = game.bestMove(legalMoves);
-            System.out.println(move);
-            game.superMove(move);
-            game.flipBoard();
-            game.printBoard();
         }
     }
 }
