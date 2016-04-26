@@ -390,7 +390,16 @@ public class Game {
     }
 
     public void printBoard() {
+        for (int i = 0; i < 9; i++) {
+            System.out.print(i + " |");
+        }
+        System.out.println();
+
+        int counter = 1;
         for (Piece[] row: board) {
+            System.out.print(counter + " |");
+            counter++;
+
             for (Piece piece: row) {
                 if (piece != null)
                     System.out.print(piece.toString() + "|");
