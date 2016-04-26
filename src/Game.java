@@ -543,6 +543,9 @@ public class Game {
         } catch (IndexOutOfBoundsException e) {
             System.out.println("That's not a real square");
             return false;
+        } catch (NullPointerException e) {
+            System.out.println("A piece doesn't exist in that spot");
+            return false;
         }
     }
 
