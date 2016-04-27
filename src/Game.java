@@ -13,6 +13,7 @@ public class Game {
 
     public Game() {
         generateNewBoard();
+        flipBoard();
     }
 
     private void generateNewBoard() {
@@ -73,7 +74,7 @@ public class Game {
         }
     }
     
-    public LinkedList<String> legalMoves(int colour) {
+    public LinkedList<String> legalMoves(int colour) { //Colour that is being checked must be on the bottom of the board, flip board first if necessary
         LinkedList<String> moves = new LinkedList<>();
 
         if (colour == Piece.BLACK) {
@@ -82,35 +83,59 @@ public class Game {
                 int column = piece.getColumn();
 
                 if (piece.getPieceType() == Piece.PAWN) {
-                    potentialPawnMoves(row, column, piece.isPawnFirstMove(), moves);
+                    potentialPawnMoves(row, column, piece.isPawnFirstMove(), moves, Piece.WHITE);
 
                 } else if (piece.getPieceType() == Piece.ROOK) {
-                    potentialRookMoves(row, column, moves);
+                    potentialRookMoves(row, column, moves, Piece.WHITE, Piece.BLACK);
 
                 } else if (piece.getPieceType() == Piece.BISHOP) {
-                    potentialBishopMoves(row, column, moves);
+                    potentialBishopMoves(row, column, moves, Piece.WHITE, Piece.BLACK);
 
                 } else if (piece.getPieceType() == Piece.QUEEN) { //The Queen basically just does both those things
-                    potentialBishopMoves(row, column, moves);
-                    potentialRookMoves(row, column, moves);
+                    potentialBishopMoves(row, column, moves, Piece.WHITE, Piece.BLACK);
+                    potentialRookMoves(row, column, moves, Piece.WHITE, Piece.BLACK);
 
                 } else if (piece.getPieceType() == Piece.KNIGHT) {
-                    potentialKnightMoves(row, column, moves);
+                    potentialKnightMoves(row, column, moves, Piece.WHITE);
 
                 } else if (piece.getPieceType() == Piece.KING) {
-                    potentialKingMoves(row, column, moves);
+                    potentialKingMoves(row, column, moves, Piece.WHITE);
+                }
+            }
+        } else {
+            for (Piece piece: whitePieces) {
+                int row = piece.getRow();
+                int column = piece.getColumn();
+
+                if (piece.getPieceType() == Piece.PAWN) {
+                    potentialPawnMoves(row, column, piece.isPawnFirstMove(), moves, Piece.BLACK);
+
+                } else if (piece.getPieceType() == Piece.ROOK) {
+                    potentialRookMoves(row, column, moves, Piece.BLACK, Piece.WHITE);
+
+                } else if (piece.getPieceType() == Piece.BISHOP) {
+                    potentialBishopMoves(row, column, moves, Piece.BLACK, Piece.WHITE);
+
+                } else if (piece.getPieceType() == Piece.QUEEN) { //The Queen basically just does both those things
+                    potentialBishopMoves(row, column, moves, Piece.BLACK, Piece.WHITE);
+                    potentialRookMoves(row, column, moves, Piece.BLACK, Piece.WHITE);
+
+                } else if (piece.getPieceType() == Piece.KNIGHT) {
+                    potentialKnightMoves(row, column, moves, Piece.BLACK);
+
+                } else if (piece.getPieceType() == Piece.KING) {
+                    potentialKingMoves(row, column, moves, Piece.BLACK);
                 }
             }
         }
-
         return moves;
     }
 
-    private void potentialKnightMoves(int row, int column, LinkedList<String> moves) {
+    private void potentialKnightMoves(int row, int column, LinkedList<String> moves, int enemyColour) {
         int newRow = row - 2;
         int newColumn = column - 1;
         if (newRow >= 0 && newColumn >= 0) { //up L left
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -118,7 +143,7 @@ public class Game {
         newRow = row - 2;
         newColumn = column + 1;
         if (newRow >= 0 && newColumn < 8) { //up L right
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -126,7 +151,7 @@ public class Game {
         newRow = row - 1;
         newColumn = column + 2;
         if (newRow >= 0 && newColumn < 8) { //right L up
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -134,7 +159,7 @@ public class Game {
         newRow = row + 1;
         newColumn = column + 2;
         if (newRow < 8 && newColumn < 8) { //right L down
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -142,7 +167,7 @@ public class Game {
         newRow = row + 2;
         newColumn = column - 1;
         if (newRow < 8 && newColumn >= 0) { //down L left
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -150,7 +175,7 @@ public class Game {
         newRow = row + 2;
         newColumn = column + 1;
         if (newRow < 8 && newColumn < 8) { //down L right
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -158,7 +183,7 @@ public class Game {
         newRow = row - 1;
         newColumn = column - 2;
         if (newRow >= 0 && newColumn >= 0) { //left L up
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -166,7 +191,7 @@ public class Game {
         newRow = row + 1;
         newColumn = column - 2;
         if (newRow < 8 && newColumn >= 0) { //left L down
-            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == Piece.WHITE) {
+            if (board[newRow][newColumn] == null || board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
             }
         }
@@ -174,50 +199,50 @@ public class Game {
 
     }
 
-    private void potentialKingMoves(int row, int column, LinkedList<String> moves) {
-        if (row - 1 >= 0 && (board[row - 1][column] == null || board[row - 1][column].getColour() == Piece.WHITE)) { //up
+    private void potentialKingMoves(int row, int column, LinkedList<String> moves, int enemyColour) {
+        if (row - 1 >= 0 && (board[row - 1][column] == null || board[row - 1][column].getColour() == enemyColour)) { //up
             moves.add(row + "" + column + (row - 1) + column);
         }
 
-        if (row + 1 < 8 && (board[row + 1][column] == null || board[row + 1][column].getColour() == Piece.WHITE)) { //down
+        if (row + 1 < 8 && (board[row + 1][column] == null || board[row + 1][column].getColour() == enemyColour)) { //down
             moves.add(row + "" + column + (row + 1) + column);
         }
 
-        if (column - 1 >= 0 && (board[row][column - 1] == null || board[row][column - 1].getColour() == Piece.WHITE)) { //left
+        if (column - 1 >= 0 && (board[row][column - 1] == null || board[row][column - 1].getColour() == enemyColour)) { //left
             moves.add(row + "" + column + row + (column - 1));
         }
 
-        if (column + 1 < 8 && (board[row][column + 1] == null || board[row][column + 1].getColour() == Piece.WHITE)) { //right
+        if (column + 1 < 8 && (board[row][column + 1] == null || board[row][column + 1].getColour() == enemyColour)) { //right
             moves.add(row + "" + column + row + (column + 1));
         }
 
-        if (row - 1 >= 0 && column + 1 < 8 && (board[row - 1][column + 1] == null || board[row - 1][column + 1].getColour() == Piece.WHITE)) { //up right
+        if (row - 1 >= 0 && column + 1 < 8 && (board[row - 1][column + 1] == null || board[row - 1][column + 1].getColour() == enemyColour)) { //up right
             moves.add(row + "" + column + (row - 1) + (column + 1));
         }
 
-        if (row + 1 < 8 && column + 1 < 8 && (board[row + 1][column + 1] == null || board[row + 1][column + 1].getColour() == Piece.WHITE)) { //down right
+        if (row + 1 < 8 && column + 1 < 8 && (board[row + 1][column + 1] == null || board[row + 1][column + 1].getColour() == enemyColour)) { //down right
             moves.add(row + "" + column + (row + 1) + (column + 1));
         }
 
-        if (row + 1 < 8 && column - 1 >= 0 && (board[row + 1][column - 1] == null || board[row + 1][column - 1].getColour() == Piece.WHITE)) { //down left
+        if (row + 1 < 8 && column - 1 >= 0 && (board[row + 1][column - 1] == null || board[row + 1][column - 1].getColour() == enemyColour)) { //down left
             moves.add(row + "" + column + (row + 1) + (column - 1));
         }
 
-        if (row - 1 >= 0 && column - 1 >= 0 && (board[row - 1][column + 1] == null || board[row - 1][column + 1].getColour() == Piece.WHITE)) { //up left
+        if (row - 1 >= 0 && column - 1 >= 0 && (board[row - 1][column + 1] == null || board[row - 1][column + 1].getColour() == enemyColour)) { //up left
             moves.add(row + "" + column + (row - 1) + (column - 1));
         }
     }
 
-    private void potentialBishopMoves(int row, int column, LinkedList<String> moves) {
+    private void potentialBishopMoves(int row, int column, LinkedList<String> moves, int enemyColour, int selfColour) {
         int newRow = row - 1;
         int newColumn = column - 1;
         while (newRow >= 0 && newColumn >= 0) { //Going up left
             if (board[newRow][newColumn] == null) {
                 moves.add(row + "" + column + newRow + newColumn);
-            } else if (board[newRow][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
                 break;
-            } else if (board[newRow][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[newRow][newColumn].getColour() == selfColour) {
                 break;
             }
             newRow--;
@@ -229,10 +254,10 @@ public class Game {
         while (newRow >= 0 && newColumn < 8) { //Going up right
             if (board[newRow][newColumn] == null) {
                 moves.add(row + "" + column + newRow + newColumn);
-            } else if (board[newRow][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
                 break;
-            } else if (board[newRow][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[newRow][newColumn].getColour() == selfColour) {
                 break;
             }
             newRow--;
@@ -244,10 +269,10 @@ public class Game {
         while (newRow < 8 && newColumn >= 0) { //Going down left
             if (board[newRow][newColumn] == null) {
                 moves.add(row + "" + column + newRow + newColumn);
-            } else if (board[newRow][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
                 break;
-            } else if (board[newRow][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[newRow][newColumn].getColour() == selfColour) {
                 break;
             }
             newRow++;
@@ -259,10 +284,10 @@ public class Game {
         while (newRow < 8 && newColumn < 8) { //Going down right
             if (board[newRow][newColumn] == null) {
                 moves.add(row + "" + column + newRow + newColumn);
-            } else if (board[newRow][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[newRow][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + newColumn);
                 break;
-            } else if (board[newRow][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[newRow][newColumn].getColour() == selfColour) {
                 break;
             }
             newRow++;
@@ -271,15 +296,15 @@ public class Game {
 
     }
 
-    private void potentialRookMoves(int row, int column, LinkedList<String> moves) {
+    private void potentialRookMoves(int row, int column, LinkedList<String> moves, int enemyColour, int selfColour) {
         int newRow = row - 1;
         while (newRow >= 0) { //going up
             if (board[newRow][column] == null) {
                 moves.add(row + "" + column + newRow + column);
-            } else if (board[newRow][column].getColour() == Piece.WHITE) {
+            } else if (board[newRow][column].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + column);
                 break;
-            } else if (board[newRow][column].getColour() == Piece.BLACK) {
+            } else if (board[newRow][column].getColour() == selfColour) {
                 break;
             }
             newRow--;
@@ -289,10 +314,10 @@ public class Game {
         while (newRow < 8) { //going down
             if (board[newRow][column] == null) {
                 moves.add(row + "" + column + newRow + column);
-            } else if (board[newRow][column].getColour() == Piece.WHITE) {
+            } else if (board[newRow][column].getColour() == enemyColour) {
                 moves.add(row + "" + column + newRow + column);
                 break;
-            }else if (board[newRow][column].getColour() == Piece.BLACK) {
+            }else if (board[newRow][column].getColour() == selfColour) {
                 break;
             }
             newRow++;
@@ -302,10 +327,10 @@ public class Game {
         while (newColumn < 8) { //going right
             if (board[row][newColumn] == null) {
                 moves.add(row + "" + column + row + newColumn);
-            } else if (board[row][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[row][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + row + newColumn);
                 break;
-            } else if (board[row][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[row][newColumn].getColour() == selfColour) {
                 break;
             }
             newColumn++;
@@ -315,17 +340,17 @@ public class Game {
         while (newColumn >= 0) { //going left
             if (board[row][newColumn] == null) {
                 moves.add(row + "" + column + row + newColumn);
-            } else if (board[row][newColumn].getColour() == Piece.WHITE) {
+            } else if (board[row][newColumn].getColour() == enemyColour) {
                 moves.add(row + "" + column + row + newColumn);
                 break;
-            } else if (board[row][newColumn].getColour() == Piece.BLACK) {
+            } else if (board[row][newColumn].getColour() == selfColour) {
                 break;
             }
             newColumn--;
         }
     }
 
-    private void potentialPawnMoves(int row, int column, boolean firstMove, LinkedList<String> moves) {
+    private void potentialPawnMoves(int row, int column, boolean firstMove, LinkedList<String> moves, int enemyColour) {
         if (firstMove && board[row - 2][column] == null) { //going forwards 2 steps
             moves.add(row + "" + column + (row - 2) + column);
 
@@ -334,11 +359,11 @@ public class Game {
             moves.add(row + "" + column + (row - 1) + column);
 
         }
-        if (column - 1 >= 0 && board[row - 1][column - 1] != null && board[row - 1][column - 1].getColour() == Piece.WHITE) { //going up left
+        if (column - 1 >= 0 && board[row - 1][column - 1] != null && board[row - 1][column - 1].getColour() == enemyColour) { //going up left
             moves.add(row + "" + column + (row - 1) + (column - 1));
 
         }
-        if (column + 1 < 8 && board[row - 1][column + 1] != null && board[row - 1][column + 1].getColour() == Piece.WHITE) { //going up right
+        if (column + 1 < 8 && board[row - 1][column + 1] != null && board[row - 1][column + 1].getColour() == enemyColour) { //going up right
             moves.add(row + "" + column + (row - 1) + (column + 1));
 
         }
@@ -402,13 +427,16 @@ public class Game {
 
             for (Piece piece: row) {
                 if (piece != null)
-                    System.out.print(piece.toString() + "|");
+                    System.out.print(piece.printCharacter() + "|");
                 else
                     System.out.print("0 " + "|");
             }
             System.out.println();
         }
         System.out.println();
+
+        System.out.println("White Pieces: " + whitePieces);
+        System.out.println("Black Pieces: " + blackPieces);
     }
 
     public int evaluateBoard(int colour) {
@@ -492,7 +520,7 @@ public class Game {
     }
 
     public String bestMove(LinkedList<String> moves) {
-        int bestScore = -1;
+        int bestScore = -100000;
         String bestMove = "";
 
         makeTempRecordOfBoard();
@@ -512,7 +540,18 @@ public class Game {
         return bestMove;
     }
 
+    public void botMove() { //Takes in a board with WHITE at the bottom, returns a board with WHITE at the bottom after making its move
+        flipBoard();
+
+        printBoard();
+        String bestMove = bestMove(legalMoves(Piece.BLACK));
+        superMove(bestMove);
+
+        flipBoard();
+    }
+
     public boolean superMove(String move) {
+        System.out.println("move is: " + GameStart.process(move, 1));
         int fromRow = Integer.parseInt(move.charAt(0) + "");
         int fromColumn = Integer.parseInt(move.charAt(1) + "");
         int toRow = Integer.parseInt(move.charAt(2) + "");
@@ -556,10 +595,10 @@ public class Game {
 
             Piece toPiece = board[toRow][toColumn];
             if (toPiece != null) {
-                if (piece.getColour() == Piece.BLACK) {
+                if (toPiece.getColour() == Piece.BLACK) {
                     blackPieces.remove(toPiece);
 
-                } else if (piece.getColour() == Piece.WHITE) {
+                } else if (toPiece.getColour() == Piece.WHITE) {
                     whitePieces.remove(toPiece);
                 }
             }
@@ -568,58 +607,6 @@ public class Game {
             return true;
         } catch (IndexOutOfBoundsException e) {
             System.out.println("That's not a real square");
-            return false;
-        }
-    }
-
-    public boolean userMove(String move) { //same as supermove but takes in coords + 1
-        int fromRow = Integer.parseInt(move.charAt(0) + "") - 1;
-        int fromColumn = Integer.parseInt(move.charAt(1) + "") - 1;
-        int toRow = Integer.parseInt(move.charAt(2) + "") - 1;
-        int toColumn = Integer.parseInt(move.charAt(3) + "") - 1;
-
-        if (fromRow < 0) {
-            fromRow = 0;
-        }
-
-        if (fromColumn < 0) {
-            fromColumn = 0;
-        }
-
-        if (toRow < 0) {
-            toRow = 0;
-        }
-
-        if (toColumn < 0) {
-            toColumn = 0;
-        }
-
-        try {
-            Piece piece = board[fromRow][fromColumn];
-            piece.setRow(toRow);
-            piece.setColumn(toColumn);
-            if (piece.getPieceType() == Piece.PAWN) {
-                piece.setPawnFirstMove(false);
-            }
-            board[fromRow][fromColumn] = null;
-
-            Piece toPiece = board[toRow][toColumn];
-            if (toPiece != null) {
-                if (piece.getColour() == Piece.BLACK) {
-                    blackPieces.remove(toPiece);
-
-                } else if (piece.getColour() == Piece.WHITE) {
-                    whitePieces.remove(toPiece);
-                }
-            }
-
-            board[toRow][toColumn] = piece;
-            return true;
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("That's not a real square");
-            return false;
-        } catch (NullPointerException e) {
-            System.out.println("A piece doesn't exist in that spot");
             return false;
         }
     }

@@ -58,7 +58,7 @@ public class Piece {
         this.pawnFirstMove = pawnFirstMove;
     }
 
-    public String toString() {
+    public String printCharacter() {
         String ret = "";
         if (colour == BLACK) {
             ret += "B";
@@ -79,6 +79,13 @@ public class Piece {
         } else {
             ret += "K";
         }
+
+        return ret;
+    }
+
+    public String toString() {
+        String ret = printCharacter();
+        ret = ret + "- " + (row + 1) + (column + 1);
 
         return ret;
     }
